@@ -25,6 +25,23 @@ app.delete("/users", (req, res) => {
     res.send("Hello From the Users Ankusha Sabharwal and Deleted from the Database");
 });
 
+//We can make the option in routing in by using "?"
+app.get("/a{b}c" , (req, res) => {
+    res.send("Hello From the Users Ankusha Sabharwal By using Param Routing Optional");
+});
+
+app.get("/checkUsername", (req, res) => {
+    console.log(req.query.userId);
+    res.send("Hello From the Users Ankusha Sabharwal and Checked the Username");
+});
+
+app.get("/checkUsername/:username", (req, res) => {
+    console.log(req.params);
+    res.send("Hello From the Users Ankusha Sabharwal and Checked the Username");
+});
+
+
+
 
 // we have to call listen method to start the server
 app.listen(3000, () => {
