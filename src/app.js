@@ -1,29 +1,36 @@
 const express = require("express");
+const path=require("./config/database");
+const connectDB=require("./config/database");
 
 const app = express(); // Create an instance of the express application
+const User=require("./Models/user");
 
 
-// All Try to use try and catch method for error handling
-
-app.get("/getUserData", (req, res) => {
- try{
-    throw new Error("User Data Not Found");
-    res.send("User Data Sent");
- }
- catch(error){
-    res.status(500).send("Some Error Contact Support Team");
-    next(error);
- }
-});
-
-
-app.use("/",(err,req,res,next)=>{
-    if(err){
-        res.status(500).send("Something Went Wrong");
+app.post("/signup", async (req, res) => {
+    const user = new User({
+      firstName: "Virat",
+      lastName: "Kohli",
+      emailId: "akshay@saini.com",
+      password: "akshay@123",
+    });
+    
+    try{    
+        await user.save();
+        res.send("User Added successfully!");
+    }catch(error){
+        res.status(500).send("User creation failed");
     }
-}) 
-
-// we have to call listen method to start the server
-app.listen(3000, () => {
-    console.log("Server is running on port 3000");
 });
+
+
+// Here First we have established the connection to the database and then we have started the server
+connectDB().then(()=>{
+    console.log("Database Connected Successfully");
+    app.listen(3000, () => {
+        console.log("Server is running on port 3000");
+    });
+}).catch((error)=>{
+    console.log("Database Connection Failed", error);
+});
+
+
