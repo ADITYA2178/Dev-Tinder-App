@@ -8,10 +8,10 @@ const User=require("./Models/user");
 
 app.post("/signup", async (req, res) => {
     const user = new User({
-      firstName: "Virat",
-      lastName: "Kohli",
-      emailId: "akshay@saini.com",
-      password: "akshay@123",
+      firstName: "Ms",
+      lastName: "Dhoni",
+      emailId: "msdhoni@gmail.com",
+      password: "dhonibhai",
     });
     
     try{    
