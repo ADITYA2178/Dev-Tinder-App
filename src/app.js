@@ -5,16 +5,12 @@ const connectDB=require("./config/database");
 const app = express(); // Create an instance of the express application
 const User=require("./Models/user");
 
+app.use(express.json()); //it is middleware to parse the incoming request body in JSON format and convert it into a JavaScript object
 
 app.post("/signup", async (req, res) => {
-    const user = new User({
-      firstName: "Ms",
-      lastName: "Dhoni",
-      emailId: "msdhoni@gmail.com",
-      password: "dhonibhai",
-    });
-    
-    try{    
+  
+    const user = new User(req.body);
+    try{
         await user.save();
         res.send("User Added successfully!");
     }catch(error){
