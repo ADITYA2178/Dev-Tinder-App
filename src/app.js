@@ -52,10 +52,10 @@ app.get("/feed",async(req,res)=>{
 
 
 // To DELETE THE USER BY FINDING THE ID 
-
 app.delete("/user/remove",async(req,res)=>{
-    const id=req.body.id;
-    const user=await User.findByIdAndDelete(id);
+    const userId=req.body.userId;
+    // const user=await User.findByIdAndDelete(id);
+    const user=await User.findByIdAndDelete({userId:id});
     try{
         if(!user){
             res.status(404).send("User not found");
@@ -66,7 +66,36 @@ app.delete("/user/remove",async(req,res)=>{
         res.status(500).send("Internal server error");
     }
 });
- 
+
+// To UPDATE THE USER 
+app.patch("/user/update",async(req,res)=>{
+    const id=req.body.id;
+    const user=await User.findByIdAndUpdate(id,{firstName:req.body.firstName,email:req.body.email});
+    try{
+        if(!user){
+            res.status(404).send("User not found");
+        }else{
+            res.send("User updated successfully");
+        }
+    }catch(error){
+        res.status(500).send("Internal server error");
+    }
+}); 
+
+app.patch("/user/updatebyEmailid",async(req,res)=>{
+    const email=req.body.email;
+    const user=await User.findOneAndUpdate({email:email},{firstName:req.body.firstName});
+    try{
+        if(!user){
+            res.status(404).send("User not found");
+        }else{
+            res.send("User updated successfully");
+        }
+
+    }catch(error){
+        res.status(500).send("Internal server error");
+    }
+});
 
 // Here First we have established the connection to the database and then we have started the server
 connectDB().then(()=>{
