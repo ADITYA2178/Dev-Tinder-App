@@ -14,7 +14,7 @@ app.post("/signup", async (req, res) => {
         await user.save();
         res.send("User Added successfully!");
     }catch(error){
-        res.status(500).send("User creation failed");
+        res.status(400).send(error.message);
     }
 });
 
@@ -70,7 +70,11 @@ app.delete("/user/remove",async(req,res)=>{
 // To UPDATE THE USER 
 app.patch("/user/update",async(req,res)=>{
     const id=req.body.id;
-    const user=await User.findByIdAndUpdate(id,{firstName:req.body.firstName,email:req.body.email});
+    // const user=await User.findByIdAndUpdate(id,{firstName:req.body.firstName,email:req.body.email});
+    const user = await User.findByIdAndUpdate({_id:id},req.body,{
+        returnDocument:"after",
+        runValidators:true
+    });
     try{
         if(!user){
             res.status(404).send("User not found");
