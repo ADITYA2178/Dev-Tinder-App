@@ -26,6 +26,11 @@ const userSchema=new mongoose.Schema({
     password:{
         type:String,
         required:true,
+        validate(value){
+            if(!validator.isStrongPassword(value)){
+                throw new Error("Password is not strong");
+            }
+        },
     },
     age:{
         type:Number,
@@ -44,6 +49,11 @@ const userSchema=new mongoose.Schema({
     },
     photoUrl:{
         type:String,
+        validate(value){
+            if(!validator.isURL(value)){
+                throw new Error("Invalid photo URL");
+            }
+        },
         default:"https://www.magnific.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_36332651.htm#fromView=keyword&page=1&position=0&uuid=50504d02-a27c-47e4-9272-46f13958a57f&track=ais_hybrid&query=Dummy+person"
     },
     about:{
