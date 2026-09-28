@@ -19,6 +19,7 @@
     "express": "^5.2.1",
     "mongoose": "^9.10.1",
     "moongoose": "^0.0.5",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "validators": "^0.3.1"
   }
 }
