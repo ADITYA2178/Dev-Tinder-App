@@ -69,7 +69,18 @@ app.delete("/user/remove",async(req,res)=>{
 
 // To UPDATE THE USER 
 app.patch("/user/update",async(req,res)=>{
+
     const id=req.body.id;
+    const ALLOWED_FIELDS = ["id", "firstName", "lastName", "password", "skills"];
+    const isUpdatedAllowed=Object.keys(req.body).every((key)=>ALLOWED_FIELDS.includes(key));
+
+    if(!isUpdatedAllowed){
+        return res.status(400).send("Invalid fields to update");
+    }
+
+    if(req.body?.skills?.length > 2){
+        return res.status(400).send("Skills should be less than 2");
+    }
     // const user=await User.findByIdAndUpdate(id,{firstName:req.body.firstName,email:req.body.email});
     const user = await User.findByIdAndUpdate({_id:id},req.body,{
         returnDocument:"after",
