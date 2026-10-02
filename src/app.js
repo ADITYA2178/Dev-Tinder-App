@@ -1,6 +1,8 @@
 const express = require("express");
 const path = require("./config/database");
 const connectDB = require("./config/database");
+const { validateSignupData } = require("./utils/validation");
+
 const app = express(); // Create an instance of the express application
 const User = require("./Models/user");
 
@@ -10,6 +12,7 @@ app.post("/signup", async (req, res) => {
 
     //Encrypt the password
     try {
+        validateSignupData(req);
         const user = new User(req.body);
         await user.save();
         res.send("User Added successfully!");
