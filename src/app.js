@@ -1,124 +1,124 @@
 const express = require("express");
-const path=require("./config/database");
-const connectDB=require("./config/database");
-
+const path = require("./config/database");
+const connectDB = require("./config/database");
 const app = express(); // Create an instance of the express application
-const User=require("./Models/user");
+const User = require("./Models/user");
 
 app.use(express.json()); //it is middleware to parse the incoming request body in JSON format and convert it into a JavaScript object
 
 app.post("/signup", async (req, res) => {
-  
-    const user = new User(req.body);
-    try{
+
+    //Encrypt the password
+    try {
+        const user = new User(req.body);
         await user.save();
         res.send("User Added successfully!");
-    }catch(error){
+    } catch (error) {
         res.status(400).send(error.message);
     }
 });
 
 
 // Get User by email 
-app.get("/user",async(req,res)=>{
-    const firstName=req.body.firstName;
-    const user=await User.find({firstName});
+app.get("/user", async (req, res) => {
+    const firstName = req.body.firstName;
+    const user = await User.find({ firstName });
 
-    try{
+    try {
         if (!user) {
             res.status(404).send("User not found");
-          } else { 
+        } else {
             res.send(user);
         }
     }
-    catch(error){
+    catch (error) {
         res.status(500).send("Internal server error");
     }
 })
 
 //Feed Api
-app.get("/feed",async(req,res)=>{
-    const user=await User.find({});
-    try{
-        if(user.length === 0){
+app.get("/feed", async (req, res) => {
+    const user = await User.find({});
+    try {
+        if (user.length === 0) {
             res.status(404).send("No users found");
-        }else{
+        } else {
             res.send(user);
         }
-    }catch(error){
+    } catch (error) {
         res.status(500).send("Internal server error");
     }
 });
 
 
 // To DELETE THE USER BY FINDING THE ID 
-app.delete("/user/remove",async(req,res)=>{
-    const userId=req.body.userId;
+app.delete("/user/remove", async (req, res) => {
+    const userId = req.body.userId;
     // const user=await User.findByIdAndDelete(id);
-    const user=await User.findByIdAndDelete({userId:id});
-    try{
-        if(!user){
+    const user = await User.findByIdAndDelete({ userId: id });
+    try {
+        if (!user) {
             res.status(404).send("User not found");
-        }else{
+        } else {
             res.send("User deleted successfully");
         }
-    }catch(error){
+    } catch (error) {
         res.status(500).send("Internal server error");
     }
 });
 
 // To UPDATE THE USER 
-app.patch("/user/update",async(req,res)=>{
+app.patch("/user/update", async (req, res) => {
 
-    const id=req.body.id;
+    const id = req.body.id;
     const ALLOWED_FIELDS = ["id", "firstName", "lastName", "password", "skills"];
-    const isUpdatedAllowed=Object.keys(req.body).every((key)=>ALLOWED_FIELDS.includes(key));
+    const isUpdatedAllowed = Object.keys(req.body).every((key) => ALLOWED_FIELDS.includes(key));
 
-    if(!isUpdatedAllowed){
+    if (!isUpdatedAllowed) {
         return res.status(400).send("Invalid fields to update");
     }
 
-    if(req.body?.skills?.length > 2){
+    if (req.body?.skills?.length > 2) {
         return res.status(400).send("Skills should be less than 2");
     }
     // const user=await User.findByIdAndUpdate(id,{firstName:req.body.firstName,email:req.body.email});
-    const user = await User.findByIdAndUpdate({_id:id},req.body,{
-        returnDocument:"after",
-        runValidators:true
+    const user = await User.findByIdAndUpdate({ _id: id }, req.body, {
+        returnDocument: "after",
+        runValidators: true
     });
-    try{
-        if(!user){
+    try {
+        if (!user) {
             res.status(404).send("User not found");
-        }else{
+        } else {
             res.send("User updated successfully");
         }
-    }catch(error){
+    } catch (error) {
         res.status(500).send("Internal server error");
     }
-}); 
+});
 
-app.patch("/user/updatebyEmailid",async(req,res)=>{
-    const email=req.body.email;
-    const user=await User.findOneAndUpdate({email:email},{firstName:req.body.firstName});
-    try{
-        if(!user){
+app.patch("/user/updatebyEmailid", async (req, res) => {
+    const email = req.body.email;
+    const user = await User.findOneAndUpdate({ email: email }, { firstName: req.body.firstName });
+    try {
+        if (!user) {
             res.status(404).send("User not found");
-        }else{
+        } else {
             res.send("User updated successfully");
         }
 
-    }catch(error){
+    } catch (error) {
         res.status(500).send("Internal server error");
     }
 });
 
 // Here First we have established the connection to the database and then we have started the server
-connectDB().then(()=>{
+connectDB().then(() => {
     console.log("Database Connected Successfully");
     app.listen(3000, () => {
         console.log("Server is running on port 3000");
     });
-}).catch((error)=>{
+}).catch((error) => {
     console.log("Database Connection Failed", error);
 });
 
