@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("./config/database");
 const connectDB = require("./config/database");
 const { validateSignupData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 const app = express(); // Create an instance of the express application
 const User = require("./Models/user");
@@ -10,10 +11,19 @@ app.use(express.json()); //it is middleware to parse the incoming request body i
 
 app.post("/signup", async (req, res) => {
 
+
     //Encrypt the password
     try {
         validateSignupData(req);
-        const user = new User(req.body);
+        const {firstName,lastName,email,password} = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log(hashedPassword);
+        const user = new User({
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword
+        });
         await user.save();
         res.send("User Added successfully!");
     } catch (error) {
@@ -21,6 +31,24 @@ app.post("/signup", async (req, res) => {
     }
 });
 
+app.post("/login", async (req, res) => {
+     
+    try {
+        const {email,password} = req.body;
+        const user = await User.findOne({email});
+        if(!user){
+            return res.status(401).send("Invalid email or password");
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if(!isPasswordValid){
+            return res.status(401).send("Invalid email or password");   
+        }
+        res.send("Login successful");
+    }
+    catch (error) {
+        res.status(500).send("Internal server error");
+    }
+});
 
 // Get User by email 
 app.get("/user", async (req, res) => {
