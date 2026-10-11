@@ -48,12 +48,11 @@ app.post("/login", async (req, res) => {
         console.log(token);
         //Add the token to cookie and send the response back to the user
         res.cookie("token",token);
-        res.send("Login successful");
+        return res.send("Login successful");
         }
         else{
             return res.status(401).send("Invalid email or password");   
         }
-        res.send("Login successful");
     }
     catch (error) {
         res.status(500).send("Internal server error");
@@ -67,7 +66,11 @@ app.get("/profile", async (req, res) => {
     const {token} = cookie;
 
     const decoded = await jwt.verify(token,process.env.JWT_SECRET);
-    console.log(decoded);
+    
+    const {_id} = decoded;
+
+    console.log("Decoded Used Id:",_id);
+
     res.send("Reading Cookie");
 
 });
