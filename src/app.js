@@ -3,10 +3,12 @@ const path = require("./config/database");
 const connectDB = require("./config/database");
 const { validateSignupData } = require("./utils/validation");
 const bcrypt = require("bcrypt");
-
-const app = express(); // Create an instance of the express application
 const User = require("./Models/user");
+const cookieParser = require("cookie-parser");
+const app = express(); // Create an instance of the express application
+const jwt = require("jsonwebtoken");
 
+app.use(cookieParser());
 app.use(express.json()); //it is middleware to parse the incoming request body in JSON format and convert it into a JavaScript object
 
 app.post("/signup", async (req, res) => {
@@ -40,16 +42,36 @@ app.post("/login", async (req, res) => {
             return res.status(401).send("Invalid email or password");
         }
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        if(!isPasswordValid){
+
+        if(isPasswordValid){
+        const token = await jwt.sign({_id:user._id},process.env.JWT_SECRET,{expiresIn:"1h"});
+        console.log(token);
+        //Add the token to cookie and send the response back to the user
+        res.cookie("token",token);
+        res.send("Login successful");
+        }
+        else{
             return res.status(401).send("Invalid email or password");   
         }
         res.send("Login successful");
     }
     catch (error) {
         res.status(500).send("Internal server error");
-    }
+    } 
 });
 
+// Get Profile of the User
+
+app.get("/profile", async (req, res) => {
+    const cookie = req.cookies;
+    const {token} = cookie;
+
+    const decoded = await jwt.verify(token,process.env.JWT_SECRET);
+    console.log(decoded);
+    res.send("Reading Cookie");
+
+});
+ 
 // Get User by email 
 app.get("/user", async (req, res) => {
     const firstName = req.body.firstName;
